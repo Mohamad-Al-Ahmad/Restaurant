@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using Restaurant.Dtos;
-using Restaurant.Services;
+using Restaurant.Core.Dtos;
+using Restaurant.EF;
+using System;
+using System.Threading.Tasks;
 
 namespace Restaurant.Controllers
 {

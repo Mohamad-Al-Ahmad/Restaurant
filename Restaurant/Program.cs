@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Restaurant.Data;
-using Restaurant.Data.Repositories;
-using Restaurant.Services;
+using Restaurant.EF.Data;
+using Restaurant.EF.Repositories;
+using Restaurant.EF;
+using Restaurant.Core.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,13 +15,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
-builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]);
+var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
 builder.Services.AddAuthentication()
 .AddJwtBearer(options =>
