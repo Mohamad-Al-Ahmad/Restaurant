@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Restaurant.Core.Dtos;
-using Restaurant.EF;
+using Restaurant.Domain.Dtos;
+using Restaurant.Infrastructure;
 using System;
 using System.Threading.Tasks;
 

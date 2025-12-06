@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Restaurant.EF.Data;
-using Restaurant.EF.Repositories;
-using Restaurant.EF;
-using Restaurant.Core.Interfaces;
+using Restaurant.Infrastructure.Data;
+using Restaurant.Infrastructure.Repositories;
+using Restaurant.Infrastructure;
+using Restaurant.Domain.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Infrastructure.Data;
-using Restaurant.Dtos;
+using Restaurant.Domain.Dtos;
 using Restaurant.Domain.Enums;
 using Restaurant.Domain.Models;
 
