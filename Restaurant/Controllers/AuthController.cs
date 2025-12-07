@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Restaurant.Domain.Dtos;
-using Restaurant.Infrastructure;
-using System;
+using Restaurant.Infrastructure.Data;
 using System.Threading.Tasks;
 
 namespace Restaurant.Controllers
@@ -22,43 +21,25 @@ namespace Restaurant.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserRegisterDto registerDto)
         {
-            try
-            {
-                var user = _authService.Register(registerDto);
-                var token = _authService.GenerateJwtToken(user);
-                
-                return Ok(new 
-                { 
-                    Token = token,
-                    User = new { user.Id, user.Email, user.Role }
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during user registration");
-                return BadRequest(ex.Message );
-            }
+            var user = await _authService.RegisterAsync(registerDto);
+            var token = _authService.GenerateJwtToken(user);
+            
+            return Ok(new 
+            { 
+                Token = token,
+                User = new { user.Id, user.Email, user.Name }
+            });
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserLoginDto loginDto)
         {
-            try
-            {
-                var token = _authService.Login(loginDto);
-                var user = _authService.GetUserByEmail(loginDto.Email);
-                
-                return Ok(new 
-                {
-                    Token = token,
-                    User = new { user.Id, user.Email, user.Role }
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error during user login");
-                return Unauthorized("Invalid email or password");
-            }
+            var token = await _authService.LoginAsync(loginDto);
+            
+            if (token == null)
+                return Unauthorized(new { message = "Invalid email or password" });
+
+            return Ok(new { Token = token });
         }
     }
 }

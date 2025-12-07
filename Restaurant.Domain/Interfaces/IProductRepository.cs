@@ -1,4 +1,4 @@
-using Restaurant.Domain.Models;
+using Restaurant.Domain.Entity;
 
 namespace Restaurant.Domain.Interfaces;
 

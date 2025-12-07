@@ -2,41 +2,38 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
-using Restaurant.Infrastructure.Data;
 using Restaurant.Domain.Dtos;
 using Restaurant.Domain.Enums;
-using Restaurant.Domain.Models;
 
-namespace Restaurant.Infrastructure
+namespace Restaurant.Infrastructure.Data
 {
     public class AuthService
     {
         private readonly IConfiguration _configuration;
-        private readonly AppDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public AuthService(IConfiguration configuration, AppDbContext context)
+        public AuthService(IConfiguration configuration, UserManager<User> userManager)
         {
             _configuration = configuration;
-            _context = context;
+            _userManager = userManager;
         }
 
         public string GenerateJwtToken(User user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]);
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
             
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] 
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new Claim(ClaimTypes.Name, user.Email),
-                    new Claim(ClaimTypes.Role, user.Role.ToString())
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.Name)
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 Issuer = _configuration["Jwt:Issuer"],
@@ -49,43 +46,34 @@ namespace Restaurant.Infrastructure
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
-        
-        public User GetUserByEmail(string email)
-        {
-            return _context.Users.FirstOrDefault(u => u.Email == email) 
-                ?? throw new Exception("User not found");
-        }
 
-        public User Register(UserRegisterDto registerDto)
+        public async Task<User> RegisterAsync(UserRegisterDto registerDto)
         {
-            if (_context.Users.Any(u => u.Email == registerDto.Email))
-            {
-                throw new Exception("User already exists");
-            }
-
             var user = new User
             {
+                UserName = registerDto.Email,
                 Email = registerDto.Email,
-                Password = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
+                Name = registerDto.Name,
                 Role = Roles.User,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
+            await _userManager.CreateAsync(user, registerDto.Password);
             return user;
         }
 
-        public string Login(UserLoginDto loginDto)
+        public async Task<string> LoginAsync(UserLoginDto loginDto)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == loginDto.Email);
+            var user = await _userManager.FindByEmailAsync(loginDto.Email);
             
-            if (user == null || user.Password != loginDto.Password)
-            {
-                throw new UnauthorizedAccessException("Invalid email or password");
-            }
+            if (user == null)
+                return null;
+
+            var passwordValid = await _userManager.CheckPasswordAsync(user, loginDto.Password);
+            
+            if (!passwordValid)
+                return null;
 
             return GenerateJwtToken(user);
         }

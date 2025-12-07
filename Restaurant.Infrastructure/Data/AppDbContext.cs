@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
-using Restaurant.Domain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Restaurant.Domain.Entity;
 
 namespace Restaurant.Infrastructure.Data
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
-
+            
         }
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
@@ -34,12 +36,6 @@ namespace Restaurant.Infrastructure.Data
                 .IsRequired()
                 .HasMaxLength(150)
                 .HasColumnType("varchar(150)");
-
-            modelBuilder.Entity<User>()
-                .Property(u => u.Password)
-                .IsRequired()
-                .HasMaxLength(255)
-                .HasColumnType("varchar(255)");
 
             modelBuilder.Entity<User>()
                 .Property(u => u.Role)

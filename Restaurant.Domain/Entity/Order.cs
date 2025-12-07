@@ -1,10 +1,10 @@
 using Restaurant.Domain.Enums;
 
-namespace Restaurant.Domain.Models;
+namespace Restaurant.Domain.Entity;
 
 public class Order
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string CustomerName { get; set; }
     public string CustomerPhone { get; set; }
     public string CustomerAddress { get; set; }

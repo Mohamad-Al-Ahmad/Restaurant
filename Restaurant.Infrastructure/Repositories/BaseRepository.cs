@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Restaurant.Domain.Interfaces;
-using Restaurant.Domain.Models;
+using Restaurant.Domain.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
